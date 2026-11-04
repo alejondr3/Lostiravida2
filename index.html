@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#07172f" />
+    <meta
+      name="description"
+      content="Entrenador interactivo en español para aprender ciencia, seguridad y trabajo en equipo como un astronauta junior."
+    />
+    <title>Junior Astronaut Mission Trainer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="stars" aria-hidden="true"></div>
+    <header class="site-header">
+      <a class="brand" href="#" aria-label="Inicio de Junior Astronaut Mission Trainer">
+        <span class="brand-mark" aria-hidden="true"><i></i></span>
+        <span><strong>JAMT</strong><small>Academia Orbital Junior</small></span>
+      </a>
+      <div class="header-status">
+        <span class="signal"><i></i> ENLACE ACTIVO</span>
+        <button class="sound-button" id="reset-button" type="button" title="Reiniciar progreso">↻ Reiniciar</button>
+      </div>
+    </header>
+
+    <main id="app" tabindex="-1"></main>
+    <div id="announcer" class="sr-only" role="status" aria-live="polite"></div>
+
+    <footer>
+      <span>JAMT // SISTEMA DE ENTRENAMIENTO 02</span>
+      <span>Aprende · Decide · Explora</span>
+    </footer>
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
