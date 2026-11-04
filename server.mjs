@@ -9,6 +9,8 @@ const mime = {
   '.css': 'text/css; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
   '.svg': 'image/svg+xml',
+  '.png': 'image/png',
+  '.gif': 'image/gif',
 };
 
 createServer((request, response) => {
