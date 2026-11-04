@@ -1,185 +1,208 @@
 extends Control
 
-const MissionModelScript = preload("res://scripts/mission_model.gd")
-
-const BG := Color("070c1f")
-const PANEL := Color("111a35")
-const PANEL_2 := Color("18254a")
-const CYAN := Color("72e7e1")
+const StationModelScript = preload("res://scripts/station_model.gd")
+const BG := Color("050817")
+const INK := Color("e9f2ff")
+const CYAN := Color("6ff5e7")
 const AMBER := Color("ffd15c")
-const RED := Color("ff667f")
-const GREEN := Color("72e69c")
-const MUTED := Color("8795bd")
+const RED := Color("ff5577")
+const GREEN := Color("65e891")
+const ROOM_COLORS := [Color("243466"), Color("174c5c"), Color("3b2f61"), Color("17533f"), Color("56352f")]
+const ROOM_RECTS := [
+	Rect2(24, 178, 172, 248), Rect2(208, 178, 172, 248), Rect2(392, 178, 172, 248),
+	Rect2(576, 178, 172, 248), Rect2(760, 178, 176, 248)
+]
 
-var model = MissionModelScript.new()
-var selected_module := ""
-var checklist := [false, false, false, false]
-var return_step := 0
-var body: VBoxContainer
-var status_label: Label
-var alert_label: Label
-var event_data: Dictionary = {}
+var model = StationModelScript.new()
+var crew: Array[Dictionary] = [
+	{"name":"ALEX", "role":"COMANDANTE", "x":104.0, "target":104.0, "color":Color("ffd15c"), "room":0},
+	{"name":"TAYLOR", "role":"INGENIERÍA", "x":288.0, "target":288.0, "color":Color("6ff5e7"), "room":1},
+	{"name":"CASEY", "role":"CIENCIA", "x":472.0, "target":472.0, "color":Color("bd91ff"), "room":2},
+	{"name":"MORGAN", "role":"MEDICINA", "x":656.0, "target":656.0, "color":Color("65e891"), "room":3}
+]
+var selected := 1
+var dragging := false
+var running := false
+var countdown := 3.0
+var alert_text := "ENTRENAMIENTO DE EMERGENCIA"
+var alert_timer := 0.0
+var flash := 0.0
+var shake := 0.0
+var repaired_text := ""
 
 func _ready() -> void:
-	build_theme()
-	build_shell()
-	show_design()
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	set_process(true)
+	queue_redraw()
 
-func build_theme() -> void:
-	var ui_theme := Theme.new()
-	var mono := SystemFont.new()
-	mono.font_names = PackedStringArray(["Consolas", "Courier New", "monospace"])
-	ui_theme.default_font = mono
-	ui_theme.default_font_size = 14
-	var normal := StyleBoxFlat.new()
-	normal.bg_color = PANEL_2; normal.border_color = Color("41558c"); normal.set_border_width_all(2); normal.set_corner_radius_all(0)
-	normal.content_margin_left = 10; normal.content_margin_right = 10; normal.content_margin_top = 7; normal.content_margin_bottom = 7
-	var hover := normal.duplicate(); hover.bg_color = Color("263765"); hover.border_color = CYAN
-	var pressed := normal.duplicate(); pressed.bg_color = Color("0b6673"); pressed.border_color = AMBER
-	ui_theme.set_stylebox("normal", "Button", normal); ui_theme.set_stylebox("hover", "Button", hover); ui_theme.set_stylebox("pressed", "Button", pressed)
-	ui_theme.set_color("font_color", "Button", Color("eaf1ff")); ui_theme.set_color("font_pressed_color", "Button", AMBER)
-	theme = ui_theme
+func _process(delta: float) -> void:
+	if not running:
+		countdown -= delta
+		if countdown <= 0:
+			running = true; alert_text = "SIMULACIÓN ACTIVA · VIGILA LA ESTACIÓN"; alert_timer = 2.0
+		queue_redraw(); return
+	if model.finished:
+		queue_redraw(); return
+	var spawned: Array[Dictionary] = model.update(delta)
+	for event in spawned:
+		alert_text = str(event.title) + " · ASIGNA UNA TRIPULACIÓN"; alert_timer = 4.0; flash = 1.0; shake = 0.45
+	update_crew(delta)
+	if alert_timer > 0: alert_timer -= delta
+	if flash > 0: flash -= delta
+	if shake > 0: shake -= delta
+	queue_redraw()
 
-func build_shell() -> void:
-	var background := ColorRect.new(); background.color = BG; background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT); add_child(background)
-	var root := VBoxContainer.new(); root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT, Control.PRESET_MODE_MINSIZE, 12); root.add_theme_constant_override("separation", 8); add_child(root)
-	var header := HBoxContainer.new(); root.add_child(header)
-	var title := make_label("VENTANA DE LANZAMIENTO", 24, AMBER); title.size_flags_horizontal = Control.SIZE_EXPAND_FILL; header.add_child(title)
-	status_label = make_label("", 14, CYAN); header.add_child(status_label)
-	alert_label = make_label("CONTROL DE MISIÓN · EN LÍNEA", 12, GREEN); alert_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT; alert_label.custom_minimum_size.x = 280; header.add_child(alert_label)
-	var line := ColorRect.new(); line.color = CYAN; line.custom_minimum_size.y = 2; root.add_child(line)
-	body = VBoxContainer.new(); body.size_flags_vertical = Control.SIZE_EXPAND_FILL; body.add_theme_constant_override("separation", 8); root.add_child(body)
+func update_crew(delta: float) -> void:
+	for i in crew.size():
+		var member := crew[i]
+		if i == selected:
+			var axis := Input.get_axis("move_left", "move_right")
+			if absf(axis) > 0.01:
+				member.x = clampf(float(member.x) + axis * 116.0 * delta, 38, 922); member.target = member.x
+		else:
+			member.x = move_toward(float(member.x), float(member.target), 82.0 * delta)
+		member.room = room_at_x(float(member.x))
+		var hazard := model.hazard_in_room(int(member.room))
+		var actively_repairing := not hazard.is_empty() and (i != selected or Input.is_key_pressed(KEY_E))
+		if actively_repairing:
+			var complete := model.repair(int(member.room), 18.0 * delta, str(member.role))
+			if complete:
+				repaired_text = "AVERÍA RESUELTA POR " + str(member.name); alert_text = repaired_text; alert_timer = 3.0
 
-func clear_body() -> void:
-	for child in body.get_children(): child.queue_free()
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed:
+		if event.keycode >= KEY_1 and event.keycode <= KEY_4:
+			selected = int(event.keycode - KEY_1); alert_text = "CONTROL DIRECTO · " + str(crew[selected].name); alert_timer = 2
+		elif event.keycode == KEY_R and model.finished: restart()
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			var found := crew_at(event.position)
+			if found >= 0: selected = found; dragging = true
+		elif event.button_index == MOUSE_BUTTON_LEFT and not event.pressed and dragging:
+			dragging = false
+			var room := room_at_point(event.position)
+			if room >= 0:
+				crew[selected].target = ROOM_RECTS[room].get_center().x
+				alert_text = "%s → %s" % [crew[selected].name, StationModelScript.ROOM_NAMES[room]]; alert_timer = 2
+	if event is InputEventMouseMotion and dragging:
+		crew[selected].x = clampf(event.position.x, 38, 922)
+	queue_redraw()
 
-func make_label(value: String, size := 14, color := Color.WHITE) -> Label:
-	var node := Label.new(); node.text = value; node.add_theme_font_size_override("font_size", size); node.add_theme_color_override("font_color", color); return node
+func room_at_x(value: float) -> int:
+	for i in ROOM_RECTS.size():
+		if value >= ROOM_RECTS[i].position.x and value <= ROOM_RECTS[i].end.x: return i
+	return clampi(roundi((value - 24.0) / 184.0), 0, 4)
 
-func heading(value: String) -> Label: return make_label(value, 18, AMBER)
+func room_at_point(point: Vector2) -> int:
+	for i in ROOM_RECTS.size():
+		if ROOM_RECTS[i].has_point(point): return i
+	return -1
 
-func make_button(value: String, action: Callable, width := 0) -> Button:
-	var node := Button.new(); node.text = value; node.custom_minimum_size = Vector2(width, 36); node.pressed.connect(action); return node
+func crew_at(point: Vector2) -> int:
+	for i in crew.size():
+		if Rect2(float(crew[i].x) - 14, 348, 28, 62).has_point(point): return i
+	return -1
 
-func make_panel(width := 0) -> VBoxContainer:
-	var box := VBoxContainer.new(); box.custom_minimum_size.x = width; box.add_theme_constant_override("separation", 6)
-	var style := StyleBoxFlat.new(); style.bg_color = PANEL; style.border_color = Color("344770"); style.set_border_width_all(2); style.content_margin_left = 10; style.content_margin_right = 10; style.content_margin_top = 8; style.content_margin_bottom = 8
-	box.add_theme_stylebox_override("panel", style)
-	return box
+func restart() -> void:
+	model.reset(); running = false; countdown = 3; alert_text = "ENTRENAMIENTO DE EMERGENCIA"; selected = 1
+	for i in crew.size(): crew[i].x = 104.0 + i * 184.0; crew[i].target = crew[i].x; crew[i].room = i
 
-func phase(number: int, name: String) -> void: status_label.text = "FASE %d/6 · %s" % [number, name]
+func _draw() -> void:
+	draw_rect(Rect2(0, 0, 960, 540), BG)
+	draw_space()
+	var offset := Vector2.ZERO
+	if shake > 0: offset = Vector2(sin(Time.get_ticks_msec() * 0.12) * 3, cos(Time.get_ticks_msec() * 0.09) * 2)
+	draw_set_transform(offset)
+	draw_station()
+	draw_crew()
+	draw_hazards()
+	draw_set_transform(Vector2.ZERO)
+	draw_hud()
+	if not running: draw_countdown()
+	if model.finished: draw_result()
+	if flash > 0 and fmod(flash, 0.18) > 0.09: draw_rect(Rect2(0, 0, 960, 540), Color(1, 0.12, 0.16, 0.12))
 
-func resource_text() -> String:
-	return "MASA %s/%s KG   PRESUPUESTO %s/%s   ENERGÍA NETA %+d" % [model.total_mass(), MissionModelScript.MASS_LIMIT, model.total_cost(), MissionModelScript.BUDGET_LIMIT, model.net_power()]
+func draw_space() -> void:
+	for x in range(11, 960, 53):
+		var y := 72 + posmod(x * 29, 78); draw_rect(Rect2(x, y, 2, 2), Color("8497d5"))
+	draw_circle(Vector2(848, 108), 44, Color("304c8c")); draw_circle(Vector2(838, 98), 35, Color("5074bd"))
 
-func show_design() -> void:
-	phase(1, "DISEÑO"); clear_body(); alert_label.text = "ARMA LA NAVE · TODO TIENE UN COSTO"; body.add_child(make_label(resource_text(), 15, CYAN))
-	var columns := HBoxContainer.new(); columns.size_flags_vertical = Control.SIZE_EXPAND_FILL; columns.add_theme_constant_override("separation", 10); body.add_child(columns)
-	var scroll := ScrollContainer.new(); scroll.custom_minimum_size.x = 235; columns.add_child(scroll)
-	var palette := make_panel(220); scroll.add_child(palette); palette.add_child(heading("MÓDULOS"))
-	for module_id in MissionModelScript.MODULES:
-		var data: Dictionary = MissionModelScript.MODULES[module_id]
-		palette.add_child(make_button("%s · %sKG · $%s" % [data.name, data.mass, data.cost], select_module.bind(module_id), 210))
-	var center := make_panel(); center.size_flags_horizontal = Control.SIZE_EXPAND_FILL; columns.add_child(center); center.add_child(heading("PLANO DE LA NAVE · 4 × 3"))
-	var grid_box := GridContainer.new(); grid_box.columns = 4; grid_box.size_flags_vertical = Control.SIZE_EXPAND_FILL; center.add_child(grid_box)
-	for i in MissionModelScript.GRID_SIZE:
-		var module_id: String = model.grid[i]
-		var value := "CELDA %02d\nVACÍA" % (i + 1) if module_id == "" else "CELDA %02d\n%s" % [i + 1, MissionModelScript.MODULES[module_id].name]
-		var cell := make_button(value, grid_cell_pressed.bind(i), 125); cell.custom_minimum_size.y = 82; grid_box.add_child(cell)
-	center.add_child(make_label("Selecciona un módulo y una celda. Clic en un módulo instalado: retirar.", 11, MUTED))
-	var side := make_panel(220); columns.add_child(side); side.add_child(heading("REVISIÓN"))
-	var errors := model.can_launch()
-	if errors.is_empty(): side.add_child(make_label("✓ NAVE LISTA", 14, GREEN))
-	else:
-		for error in errors: side.add_child(make_label("! " + error, 12, RED))
-	side.add_child(make_label("OBLIGATORIOS\nMANDO · SOPORTE VITAL\nSOLAR · BATERÍAS\nCOMUNICACIONES", 11, MUTED))
-	var fill := Control.new(); fill.size_flags_vertical = Control.SIZE_EXPAND_FILL; side.add_child(fill)
-	var next := make_button("CONFIRMAR DISEÑO ▶", show_load, 205); next.disabled = not errors.is_empty(); side.add_child(next)
+func draw_station() -> void:
+	draw_rect(Rect2(12, 164, 936, 278), Color("8391b4")); draw_rect(Rect2(18, 170, 924, 266), Color("141d38"))
+	for i in ROOM_RECTS.size():
+		var rect: Rect2 = ROOM_RECTS[i]; var hazard := model.hazard_in_room(i)
+		draw_rect(rect, ROOM_COLORS[i]); draw_rect(rect, RED if not hazard.is_empty() else Color("6579ad"), false, 3)
+		draw_rect(Rect2(rect.position + Vector2(0, 35), Vector2(rect.size.x, 3)), Color("91a5d2"))
+		text(str(StationModelScript.ROOM_NAMES[i]), rect.position + Vector2(9, 24), 13, AMBER)
+		draw_room_equipment(i, rect)
+		if i < ROOM_RECTS.size() - 1:
+			draw_rect(Rect2(rect.end.x - 5, 320, 14, 76), Color("0a1024")); draw_rect(Rect2(rect.end.x - 5, 320, 14, 76), CYAN, false, 2)
+	draw_rect(Rect2(8, 438, 944, 12), Color("283b68")); draw_rect(Rect2(20, 450, 920, 4), CYAN)
 
-func select_module(module_id: String) -> void:
-	selected_module = module_id; alert_label.text = "SELECCIONADO · " + str(MissionModelScript.MODULES[module_id].name)
+func draw_room_equipment(index: int, rect: Rect2) -> void:
+	var p := rect.position
+	match index:
+		0:
+			for j in 3: draw_rect(Rect2(p + Vector2(16 + j * 48, 66), Vector2(38, 28)), Color("081127")); draw_rect(Rect2(p + Vector2(20 + j * 48, 70), Vector2(28, 12)), CYAN)
+		1:
+			draw_circle(p + Vector2(86, 105), 44, Color("0a1a2a")); draw_circle(p + Vector2(86, 105), 37, Color("3eb7c5"), false, 5); text("O₂", p + Vector2(73, 112), 20, INK)
+		2:
+			draw_rect(Rect2(p + Vector2(20, 67), Vector2(132, 72)), Color("131129")); for j in 5: draw_circle(p + Vector2(35 + j * 25, 102), 6, Color("b789ff"))
+		3:
+			for j in 3: draw_rect(Rect2(p + Vector2(14 + j * 51, 72), Vector2(42, 72)), Color("0b271f")); draw_circle(p + Vector2(35 + j * 51, 84), 12, GREEN)
+		4:
+			draw_rect(Rect2(p + Vector2(22, 72), Vector2(128, 55)), Color("231b20")); for j in 4: draw_rect(Rect2(p + Vector2(30 + j * 30, 82), Vector2(14, 32)), Color("d27a54"))
 
-func grid_cell_pressed(index: int) -> void:
-	if model.grid[index] != "" and index >= 2: model.remove_module(index); alert_label.text = "MÓDULO RETIRADO"
-	elif selected_module == "": alert_label.text = "SELECCIONA UN MÓDULO"
-	elif not model.set_module(index, selected_module): alert_label.text = "EXCEDE MASA O PRESUPUESTO"
-	else: alert_label.text = "MÓDULO INSTALADO"
-	show_design()
+func draw_crew() -> void:
+	for i in crew.size():
+		var member := crew[i]; var x := float(member.x); var y := 398.0
+		if i == selected: draw_circle(Vector2(x, y + 17), 19, CYAN, false, 2)
+		# Mochila, traje, visor, brazos y piernas en bloques de píxel.
+		draw_rect(Rect2(x - 11, y - 34, 22, 15), Color("e7eadf")); draw_rect(Rect2(x - 8, y - 31, 16, 7), member.color)
+		draw_rect(Rect2(x - 12, y - 19, 24, 22), Color("d6d9d1")); draw_rect(Rect2(x - 8, y - 15, 16, 7), member.color)
+		draw_rect(Rect2(x - 15, y - 16, 5, 17), Color("d6d9d1")); draw_rect(Rect2(x + 10, y - 16, 5, 17), Color("d6d9d1"))
+		draw_rect(Rect2(x - 10, y + 3, 8, 12), Color("e7eadf")); draw_rect(Rect2(x + 2, y + 3, 8, 12), Color("e7eadf"))
+		text(str(member.name), Vector2(x - 24, y + 31), 11, member.color)
 
-func show_load() -> void:
-	phase(2, "CARGA"); clear_body(); alert_label.text = "CADA KILO CUENTA"; body.add_child(make_label(resource_text(), 15, CYAN))
-	var columns := HBoxContainer.new(); columns.size_flags_vertical = Control.SIZE_EXPAND_FILL; columns.add_theme_constant_override("separation", 14); body.add_child(columns)
-	var cargo_panel := make_panel(); cargo_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL; columns.add_child(cargo_panel); cargo_panel.add_child(heading("SUMINISTROS"))
-	for cargo_id in MissionModelScript.CARGO:
-		var row := HBoxContainer.new(); cargo_panel.add_child(row); var data: Dictionary = MissionModelScript.CARGO[cargo_id]
-		var item := make_label("%s · %s KG" % [data.name, data.mass], 14); item.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(item)
-		row.add_child(make_button("−", adjust_cargo.bind(cargo_id, -1), 42)); row.add_child(make_label("  %02d  " % model.cargo[cargo_id], 17, AMBER)); row.add_child(make_button("+", adjust_cargo.bind(cargo_id, 1), 42))
-	var crew := make_panel(350); columns.add_child(crew); crew.add_child(heading("COOPERATIVO LOCAL")); crew.add_child(make_label("Participantes activos", 13, MUTED))
-	var crew_row := HBoxContainer.new(); crew.add_child(crew_row)
-	for count in range(1, 5): crew_row.add_child(make_button(str(count), set_crew.bind(count), 60))
-	crew.add_child(make_label("ACTIVOS: %d\n\nCOMANDANTE\nINGENIERÍA\nCIENCIA\nCOMUNICACIONES / DATOS" % model.crew_count, 15, CYAN))
-	var footer := HBoxContainer.new(); body.add_child(footer); footer.add_child(make_button("◀ VOLVER", show_design, 160)); var fill := Control.new(); fill.size_flags_horizontal = Control.SIZE_EXPAND_FILL; footer.add_child(fill); footer.add_child(make_button("IR A LANZAMIENTO ▶", show_launch, 230))
+func draw_hazards() -> void:
+	for hazard in model.hazards:
+		var room: int = int(hazard.room)
+		var center: Vector2 = ROOM_RECTS[room].get_center()
+		var pulse: float = sin(Time.get_ticks_msec() * 0.018)
+		match str(hazard.type):
+			"fire":
+				for i in 5: draw_colored_polygon(PackedVector2Array([center + Vector2(-36 + i * 17, 48), center + Vector2(-27 + i * 17, 18 + pulse * 5), center + Vector2(-18 + i * 17, 48)]), RED if i % 2 == 0 else AMBER)
+			"leak":
+				for i in 6: draw_line(center + Vector2(-35, -10 + i * 8), center + Vector2(35 + pulse * 8, -10 + i * 8), CYAN, 2)
+			"power":
+				draw_polyline(PackedVector2Array([center + Vector2(-25,-35), center + Vector2(8,-5), center + Vector2(-8,3), center + Vector2(25,35)]), AMBER, 5)
+			"debris":
+				draw_circle(center, 28 + pulse * 3, RED, false, 5); draw_line(center - Vector2(35,35), center + Vector2(35,35), RED, 3); draw_line(center + Vector2(35,-35), center - Vector2(35,-35), RED, 3)
+		var bar := Rect2(center.x - 55, ROOM_RECTS[room].position.y + 45, 110, 8)
+		draw_rect(bar, Color("220914")); draw_rect(Rect2(bar.position, Vector2(bar.size.x * float(hazard.progress) / 100.0, 8)), GREEN)
 
-func adjust_cargo(cargo_id: String, amount: int) -> void:
-	if not model.adjust_cargo(cargo_id, amount): alert_label.text = "LÍMITE ALCANZADO"
-	show_load()
+func draw_hud() -> void:
+	draw_rect(Rect2(0, 0, 960, 66), Color("e6081024")); draw_line(Vector2(0, 65), Vector2(960, 65), CYAN, 2)
+	text("VENTANA DE LANZAMIENTO", Vector2(18, 27), 20, AMBER); text("ENTRENADOR ORBITAL · TIEMPO %02d:%02d" % [int(model.elapsed) / 60, int(model.elapsed) % 60], Vector2(18, 51), 12, CYAN)
+	draw_meter(Vector2(360, 13), "O₂", model.oxygen, CYAN); draw_meter(Vector2(508, 13), "ENERGÍA", model.energy, AMBER); draw_meter(Vector2(656, 13), "CASCO", model.hull, GREEN); draw_meter(Vector2(804, 13), "MORAL", model.morale, Color("c59aff"))
+	var warning_color := RED if alert_timer > 0 or not model.hazards.is_empty() else GREEN
+	draw_rect(Rect2(12, 78, 936, 48), Color("db0b1022")); draw_rect(Rect2(12, 78, 936, 48), warning_color, false, 2)
+	text("⚠ " + alert_text, Vector2(26, 107), 17, warning_color)
+	text("ARRASTRA TRIPULANTES A UNA SALA · 1–4 CAMBIAR · A/D MOVER · MANTÉN E PARA REPARAR", Vector2(26, 479), 13, INK)
+	text("OBJETIVO: SOBREVIVE 90 SEGUNDOS Y RESUELVE TODAS LAS EMERGENCIAS", Vector2(26, 511), 14, AMBER)
+	text("RESUELTAS %d/4" % model.resolved, Vector2(806, 511), 13, GREEN)
 
-func set_crew(count: int) -> void: model.crew_count = count; show_load()
+func draw_meter(at: Vector2, name: String, value: float, color: Color) -> void:
+	text(name, at, 11, INK); draw_rect(Rect2(at + Vector2(0, 8), Vector2(124, 9)), Color("221329")); draw_rect(Rect2(at + Vector2(0, 8), Vector2(124 * value / 100.0, 9)), color); text("%03d" % value, at + Vector2(93, 0), 10, color)
 
-func show_launch() -> void:
-	phase(3, "DESPEGUE"); clear_body(); alert_label.text = "T−00:10:00 · ENCUESTA GO / NO-GO"; body.add_child(heading("CONTROL DE LANZAMIENTO")); body.add_child(make_label("Confirma cada estación. No hay despegue con un sistema NO-GO.", 14, MUTED))
-	var checks := ["CLIMA Y VIENTOS", "PROPULSIÓN Y COMBUSTIBLE", "SOPORTE VITAL Y TRIPULACIÓN", "TRAYECTORIA Y COMUNICACIONES"]
-	for i in checks.size(): body.add_child(make_button(("✓ GO  " if checklist[i] else "○ NO-GO  ") + checks[i], toggle_check.bind(i), 650))
-	var fill := Control.new(); fill.size_flags_vertical = Control.SIZE_EXPAND_FILL; body.add_child(fill)
-	var launch := make_button("INICIAR CUENTA REGRESIVA", begin_orbit, 360); launch.disabled = checklist.has(false); body.add_child(launch)
+func draw_countdown() -> void:
+	draw_rect(Rect2(0, 0, 960, 540), Color(0, 0, 0, 0.72)); text("SIMULACIÓN DE EMERGENCIA", Vector2(306, 226), 25, AMBER); text(str(maxi(1, ceili(countdown))), Vector2(457, 294), 54, CYAN)
 
-func toggle_check(index: int) -> void: checklist[index] = not checklist[index]; show_launch()
-func begin_orbit() -> void: model.start_orbit(); show_station()
+func draw_result() -> void:
+	draw_rect(Rect2(178, 144, 604, 252), Color("f0070c1f")); draw_rect(Rect2(178, 144, 604, 252), GREEN if model.won else RED, false, 4)
+	text("ESTACIÓN ESTABILIZADA" if model.won else "MISIÓN PERDIDA", Vector2(285, 205), 30, GREEN if model.won else RED)
+	text("PUNTUACIÓN %04d · EMERGENCIAS %d/4" % [model.score(), model.resolved], Vector2(300, 255), 18, INK)
+	text("PULSA R PARA REPETIR EL ENTRENAMIENTO", Vector2(285, 332), 15, AMBER)
 
-func show_station() -> void:
-	phase(4, "ESTANCIA"); clear_body(); alert_label.text = "ÓRBITA ESTABLE · TIEMPO ACELERADO"
-	body.add_child(make_label("DÍA %03d/365  SALUD %03d  MORAL %03d  O₂ %03d  AGUA %03d  COMIDA %03d  ENERGÍA %03d  CIENCIA %04d" % [model.day, model.health, model.morale, model.oxygen, model.water, model.food, model.energy, model.science], 13, CYAN))
-	var columns := HBoxContainer.new(); columns.size_flags_vertical = Control.SIZE_EXPAND_FILL; columns.add_theme_constant_override("separation", 12); body.add_child(columns)
-	var tasks := make_panel(); tasks.size_flags_horizontal = Control.SIZE_EXPAND_FILL; columns.add_child(tasks); tasks.add_child(heading("RUTINA · PRÓXIMOS 15 DÍAS"))
-	for task in ["MANTENIMIENTO", "CIENCIA", "SALUD", "COMUNICACIÓN"]: tasks.add_child(make_button(task, advance_station.bind(task), 380))
-	tasks.add_child(make_label("El tiempo se pausa automáticamente ante una alerta.", 12, MUTED))
-	var log_panel := make_panel(430); columns.add_child(log_panel); log_panel.add_child(heading("REGISTRO DE MISIÓN"))
-	var from := maxi(0, model.mission_log.size() - 10)
-	for line in model.mission_log.slice(from): log_panel.add_child(make_label(str(line), 12, Color("c8d3f3")))
-	if model.day >= 365: body.add_child(make_button("INICIAR REGRESO A TIERRA ▶", show_return, 420))
-
-func advance_station(task: String) -> void:
-	event_data = model.advance_time(task)
-	if event_data.is_empty(): show_station()
-	else: show_event()
-
-func show_event() -> void:
-	clear_body(); alert_label.text = "⚠ ALERTA PRIORITARIA · TIEMPO EN PAUSA"
-	body.add_child(make_label("⚠  " + str(event_data.title), 28, RED)); body.add_child(make_label(str(event_data.body), 18)); body.add_child(make_label("Los peligros grandes se avisan antes: la preparación decide las consecuencias.", 13, MUTED))
-	var fill := Control.new(); fill.size_flags_vertical = Control.SIZE_EXPAND_FILL; body.add_child(fill)
-	body.add_child(make_button("PROTOCOLO · " + str(event_data.safe), resolve_event.bind(true), 750)); body.add_child(make_button("ACEPTAR RIESGO · " + str(event_data.risk), resolve_event.bind(false), 750))
-
-func resolve_event(prepared: bool) -> void: alert_label.text = model.resolve_event(event_data, prepared); event_data = {}; show_station()
-
-func show_return() -> void:
-	phase(5, "REGRESO"); clear_body(); alert_label.text = "VENTANA DE REENTRADA ABIERTA"; body.add_child(heading("SECUENCIA DE REENTRADA"))
-	var steps := ["ENCENDIDO DE SALIDA DE ÓRBITA", "SEPARACIÓN DEL MÓDULO DE SERVICIO", "APAGÓN DE PLASMA", "DESPLIEGUE DE PARACAÍDAS", "AMERIZAJE Y RECUPERACIÓN"]
-	for i in steps.size(): body.add_child(make_label(("✓ " if i < return_step else "▶ " if i == return_step else "· ") + steps[i], 18, GREEN if i < return_step else AMBER if i == return_step else MUTED))
-	var fill := Control.new(); fill.size_flags_vertical = Control.SIZE_EXPAND_FILL; body.add_child(fill)
-	if return_step < steps.size(): body.add_child(make_button("CONFIRMAR PASO DE REENTRADA", next_return_step, 440))
-	else: body.add_child(make_button("ABRIR INFORME POST-MISIÓN ▶", show_report, 440))
-
-func next_return_step() -> void: return_step += 1; show_return()
-
-func show_report() -> void:
-	phase(6, "INFORME"); clear_body(); alert_label.text = "MISIÓN CERRADA · RESULTADOS"
-	body.add_child(make_label(model.outcome(), 28, GREEN if model.health > 0 else RED)); body.add_child(make_label("PUNTUACIÓN %04d   CIENCIA %04d   EVENTOS %02d   SALUD %03d" % [model.score(), model.science, model.events_survived, model.health], 17, CYAN))
-	body.add_child(heading("POR QUÉ SALIÓ ASÍ"))
-	if model.count_module("shield") == 0: body.add_child(make_label("• Sin refugio de radiación, las tormentas solo pudieron mitigarse.", 14, RED))
-	if model.count_module("workshop") == 0: body.add_child(make_label("• Sin taller, las averías consumieron más recursos.", 14, RED))
-	if model.count_module("lab") > 0: body.add_child(make_label("• El laboratorio aumentó el retorno científico.", 14, GREEN))
-	if model.count_module("greenhouse") > 0: body.add_child(make_label("• El invernadero sostuvo comida y moral.", 14, GREEN))
-	body.add_child(make_label("Rediseña y repite para comparar resultados.", 14, MUTED)); var fill := Control.new(); fill.size_flags_vertical = Control.SIZE_EXPAND_FILL; body.add_child(fill)
-	var footer := HBoxContainer.new(); body.add_child(footer); footer.add_child(make_button("REDISEÑAR Y REPETIR", restart, 260)); var gap := Control.new(); gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL; footer.add_child(gap); footer.add_child(make_label("LUNA Y MARTE · PRÓXIMAMENTE", 15, AMBER))
-
-func restart() -> void: model = MissionModelScript.new(); checklist = [false, false, false, false]; return_step = 0; selected_module = ""; show_design()
+func text(value: String, at: Vector2, size: int, color: Color) -> void:
+	draw_string(ThemeDB.fallback_font, at, value, HORIZONTAL_ALIGNMENT_LEFT, -1, size, color)

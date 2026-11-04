@@ -1,29 +1,28 @@
 extends SceneTree
 
-const MissionModelScript = preload("res://scripts/mission_model.gd")
-
+const StationModelScript = preload("res://scripts/station_model.gd")
 var failures := 0
 
 func _init() -> void:
-	var model = MissionModelScript.new()
-	check(model.grid.size() == MissionModelScript.GRID_SIZE, "la nave usa 12 celdas")
-	check(model.can_launch().is_empty(), "el diseño inicial puede lanzarse")
-	var initial_mass: int = model.total_mass()
-	check(model.set_module(2, "lab"), "se instala un módulo")
-	check(model.total_mass() > initial_mass, "el módulo aumenta la masa")
-	check(model.remove_module(2), "la nave se puede rediseñar")
-	var cargo_mass: int = model.cargo_mass()
-	check(model.adjust_cargo("food", 1), "se agrega carga")
-	check(model.cargo_mass() > cargo_mass, "la carga afecta la masa")
-	model.start_orbit()
-	var before_day: int = model.day
-	model.advance_time("CIENCIA")
-	check(model.day > before_day and model.science > 0, "la estancia avanza y produce ciencia")
-	var health_before: float = model.health
-	model.resolve_event({"title":"PRUEBA", "need":"shield"}, true)
-	check(model.health < health_before, "sin módulo correcto el peligro solo se mitiga")
-	check(model.score() >= 0, "el informe calcula una puntuación")
-	if failures == 0: print("OK: diseño, carga, estancia, eventos e informe")
+	var model = StationModelScript.new()
+	check(model.hazards.is_empty(), "la estación comienza estable")
+	var spawned: Array[Dictionary] = model.update(5.1)
+	check(spawned.size() == 1 and model.hazards.size() == 1, "la primera emergencia aparece en tiempo real")
+	var energy_before: float = model.energy
+	model.update(1.0)
+	check(model.energy < energy_before, "el incendio consume energía mientras sigue activo")
+	var room: int = int(model.hazards[0].room)
+	model.repair(room, 40.0, "COMANDANTE")
+	check(model.hazards.size() == 1, "una reparación parcial no elimina el peligro")
+	model.repair(room, 60.0, "INGENIERÍA")
+	check(model.hazards.is_empty() and model.resolved == 1, "ingeniería completa la reparación")
+	model.update(22.0)
+	check(not model.hazard_in_room(1).is_empty(), "la fuga aparece en soporte vital")
+	var oxygen_before: float = model.oxygen
+	model.update(1.0)
+	check(model.oxygen < oxygen_before, "la fuga reduce oxígeno")
+	check(model.score() > 0, "la simulación calcula puntuación")
+	if failures == 0: print("OK: movimiento temporal, emergencias, daño y reparaciones")
 	quit(failures)
 
 func check(condition: bool, message: String) -> void:

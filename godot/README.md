@@ -1,17 +1,17 @@
 # Ventana de Lanzamiento en Godot
 
-Vertical slice en Godot 4 basado en el documento de diseño del proyecto.
+Prototipo de acción y supervivencia dentro de una estación espacial 2D.
 
-## Ciclo jugable
+## Emergencia jugable
 
-1. Diseñar una nave modular en cuadrícula con masa, presupuesto y energía.
-2. Cargar tripulación, comida, agua, oxígeno y repuestos.
-3. Completar la encuesta Go/No-Go del lanzamiento.
-4. Administrar un año orbital por saltos de 15 días y rutinas.
-5. Resolver alertas mediante protocolos condicionados por los módulos instalados.
-6. Ejecutar la reentrada y recibir un informe que explica el resultado.
-
-Incluye cooperación local por roles para 1 a 4 participantes, consola retro, recursos visibles, eventos con aviso previo y Luna/Marte como expansiones futuras. El prototipo web de la raíz permanece independiente.
+- Vista lateral de cinco salas conectadas: control, soporte vital, laboratorio, hidroponía y taller.
+- Cuatro tripulantes visibles con especialidades distintas.
+- Selección directa con 1–4 y movimiento con A/D.
+- Asignación arrastrando un tripulante hasta una sala.
+- Reparación física manteniendo E junto a la avería.
+- Incendio, fuga de oxígeno, fallo eléctrico e impacto de basura espacial.
+- Oxígeno, energía, integridad del casco y moral en tiempo real.
+- Victoria al sobrevivir 90 segundos y resolver todas las emergencias.
 
 ## Ejecutar y probar
 
@@ -19,3 +19,5 @@ Incluye cooperación local por roles para 1 a 4 participantes, consola retro, re
 godot --path godot
 godot --headless --path godot --script res://tests/test_runner.gd
 ```
+
+El prototipo Canvas/JavaScript de la raíz permanece independiente.
