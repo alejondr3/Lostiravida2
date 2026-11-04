@@ -21,6 +21,9 @@ var next_event := 0
 var hazards: Array[Dictionary] = []
 var finished := false
 var won := false
+var difficulty := "OFICIAL"
+var pressure := 1.0
+var event_speed := 1.0
 var supplies := {"food":5, "water":5, "medkit":2, "parts":4, "science":0, "data":0}
 var production := [0.0, 0.0, 0.0, 0.0, 0.0]
 var ready := [0, 0, 0, 0, 0]
@@ -31,16 +34,29 @@ func reset() -> void:
 	resolved = 0; next_event = 0; hazards.clear(); finished = false; won = false
 	supplies = {"food":5, "water":5, "medkit":2, "parts":4, "science":0, "data":0}
 	production = [0.0, 0.0, 0.0, 0.0, 0.0]; ready = [0, 0, 0, 0, 0]; upgrades = [1, 1, 1, 1, 1]
+	configure(difficulty)
+
+func configure(mode: String) -> void:
+	difficulty = mode
+	match mode:
+		"CADETE":
+			pressure = 0.62; event_speed = 0.78
+			supplies.food = 8; supplies.water = 8; supplies.medkit = 4; supplies.parts = 7
+		"COMANDANTE":
+			pressure = 1.48; event_speed = 1.32
+			supplies.food = 3; supplies.water = 3; supplies.medkit = 1; supplies.parts = 2
+		_:
+			pressure = 1.0; event_speed = 1.0
 
 func update(delta: float) -> Array[Dictionary]:
 	if finished: return []
 	elapsed += delta
-	energy = maxf(0, energy - delta * 0.055)
-	oxygen = maxf(0, oxygen - delta * 0.025)
+	energy = maxf(0, energy - delta * 0.055 * pressure)
+	oxygen = maxf(0, oxygen - delta * 0.025 * pressure)
 	var spawned: Array[Dictionary] = []
-	while next_event < EVENT_PLAN.size() and elapsed >= float(EVENT_PLAN[next_event].at):
+	while next_event < EVENT_PLAN.size() and elapsed >= float(EVENT_PLAN[next_event].at) / event_speed:
 		var event: Dictionary = EVENT_PLAN[next_event].duplicate(true)
-		event["severity"] = 1.0; event["progress"] = 0.0
+		event["severity"] = pressure; event["progress"] = 0.0
 		hazards.append(event); spawned.append(event); next_event += 1
 	for hazard in hazards:
 		var damage := float(hazard.severity) * delta

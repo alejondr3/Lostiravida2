@@ -6,6 +6,12 @@ var failures := 0
 func _init() -> void:
 	var model = StationModelScript.new()
 	check(model.hazards.is_empty(), "la estación comienza estable")
+	var cadet = StationModelScript.new()
+	cadet.configure("CADETE")
+	check(cadet.pressure < 1.0 and int(cadet.supplies.food) == 8, "cadete recibe más reservas y menos presión")
+	var hard = StationModelScript.new()
+	hard.configure("COMANDANTE")
+	check(hard.pressure > 1.0 and hard.event_speed > 1.0 and int(hard.supplies.parts) == 2, "comandante acelera eventos y limita repuestos")
 	model.work_room(3, 20.0, "MEDICINA", 1.0)
 	check(int(model.ready[3]) == 1, "una tripulante asignada completa producción")
 	var food_before: int = model.supplies.food
