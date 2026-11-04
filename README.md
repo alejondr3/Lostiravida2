@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/banner-academia.png" alt="Junior Astronaut Mission Trainer: academia orbital con cohete y astronauta" width="100%" />
+
 <pre>
            .       *           .
       *                /\             *
@@ -48,6 +50,15 @@ No necesitas llegar sabiendo física orbital. Para eso existe la academia.
 > **DIRECTIVA 01:** ninguna reparación, herramienta ni récord personal vale más que volver con toda la tripulación.
 
 ## 🛰️ Tu expediente de entrenamiento
+
+<div align="center">
+
+<img src="assets/despegue.gif" alt="Cohete despegando" width="48%" />
+<img src="assets/orbita.gif" alt="Satélite orbitando la Tierra" width="48%" />
+
+**DEL PRIMER DESPEGUE A TU PRIMER PASEO ESPACIAL**
+
+</div>
 
 | Fase | Misión | Lo que vas a poner a prueba |
 | :---: | --- | --- |
@@ -114,6 +125,13 @@ El progreso pertenece al navegador donde juegas. Cambiar de dispositivo o borrar
 
 ## 🔧 Manual técnico
 
+<div align="center">
+
+<img src="assets/telemetria.gif" alt="Telemetría de sistemas en funcionamiento" width="48%" />
+<img src="assets/senal.gif" alt="Enlace de comunicaciones activo" width="48%" />
+
+</div>
+
 La academia funciona con **HTML, CSS y JavaScript nativo**. El servidor de desarrollo usa únicamente módulos incluidos en Node.js.
 
 ```text
@@ -163,5 +181,7 @@ Puedes proponer mejoras o reportar fallos en [Issues](https://github.com/alejond
 `APRENDE · DECIDE · EXPLORA`
 
 *Fin de la transmisión. Nos vemos en órbita.* 🪐
+
+<img src="assets/orbita.gif" alt="En órbita, esperando la siguiente misión" width="320" />
 
 </div>
