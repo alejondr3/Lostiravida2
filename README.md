@@ -1,100 +1,66 @@
 <div align="center">
 
-<img src="assets/banner-academia.png" alt="Junior Astronaut Mission Trainer: academia orbital con cohete y astronauta" width="100%" />
+![Operación: Última Luz — aventura espacial pixel art](assets/banner-16bit.svg)
 
-<pre>
-           .       *           .
-      *                /\             *
-                 .    /  \    .
-                     | () |
-          .          |    |          .
-                    /|    |\
-                   /_|____|_\
-                      /\
-                *    /  \    *
-                     ·  ·
-</pre>
+# OPERACIÓN: ÚLTIMA LUZ
 
-# JUNIOR ASTRONAUT<br>MISSION TRAINER
+**LOS TIRA VIDA / 02 · JUNIOR ASTRONAUT MISSION TRAINER**
 
-**ACADEMIA ORBITAL JUNIOR · PROGRAMA DE FORMACIÓN JAMT**
+`EXPLORA · REPARA · SOBREVIVE`
 
-*Tu misión empieza aquí. Tu criterio decide cómo termina.*
+![Español](https://img.shields.io/badge/IDIOMA-ESPAÑOL-7bedb3?style=for-the-badge&labelColor=080d1b)
+![Pixel art](https://img.shields.io/badge/ESTILO-16_BITS-ee9a51?style=for-the-badge&labelColor=080d1b)
+![Canvas](https://img.shields.io/badge/MOTOR-CANVAS_2D-879cb3?style=for-the-badge&labelColor=080d1b)
 
-![Español](https://img.shields.io/badge/IDIOMA-ESPAÑOL-5bd6ff?style=for-the-badge&labelColor=07172f)
-![Misiones](https://img.shields.io/badge/MISIONES-04-ff8a3d?style=for-the-badge&labelColor=07172f)
-![Decisiones](https://img.shields.io/badge/DECISIONES-12-7be495?style=for-the-badge&labelColor=07172f)
-![JavaScript](https://img.shields.io/badge/JAVASCRIPT-NATIVO-f7df1e?style=for-the-badge&labelColor=07172f)
-
----
+<img src="assets/despegue.gif" width="48%" alt="Cohete pixel art" />
+<img src="assets/orbita.gif" width="48%" alt="Satélite pixel art" />
 
 </div>
 
 ```text
-ORIGEN    : CONTROL DE MISIÓN / ACADEMIA ORBITAL
-DESTINO   : NUEVO PERSONAL CADETE
-ESTADO    : ENLACE ACTIVO
-PRIORIDAD : APRENDER ANTES DE TOCAR EL BOTÓN ROJO
+SOL 047 / CRÁTER JEZERO / 03:42
+ENERGÍA ........ FUERA DE LÍNEA
+RECICLADOR O2 .. FUERA DE LÍNEA
+COMUNICACIONES . SIN SEÑAL
+TRIPULANTE ..... TÚ
 ```
 
-## 📡 Informe de misión
+Una tormenta dejó el refugio a oscuras. Tu traje conserva oxígeno, los repuestos están dispersos y la antena sigue en el exterior.
 
-Bienvenido a bordo, cadete.
+**Operación: Última Luz** es una aventura de exploración y reparación en tiempo real con estética de 16 bits. Controlas al astronauta directamente, recorres el hábitat, recuperas piezas y restauras sistemas para solicitar extracción.
 
-El espacio es enorme. Tu nave, bastante menos. Y entre tú y el vacío hay un puñado de sistemas que conviene entender antes de que empiecen a parpadear.
+## 🎮 El plan para volver vivo
 
-**Junior Astronaut Mission Trainer** es un juego educativo en español donde tomas decisiones de seguridad, navegación y supervivencia espacial. Cada escenario presenta un problema, tres opciones y una explicación para entender qué protege a la tripulación y por qué.
+1. **Explora la base.** Cruza sus pasillos y recoge los repuestos brillantes al acercarte.
+2. **Devuelve la energía.** El reactor necesita dos piezas y cuatro segundos de reparación.
+3. **Asegura el refugio.** Repara el reciclador de oxígeno y el sistema de cultivos.
+4. **Sal de EVA.** Rodea la base y alcanza la antena del noreste. Las tormentas consumen más oxígeno en el exterior.
+5. **Pide extracción.** Con los cuatro sistemas operativos, regresa al módulo de ascenso situado al sur y prepara el despegue.
 
-No necesitas llegar sabiendo física orbital. Para eso existe la academia.
+La taquilla de Control recarga el traje. El reciclador reparado recupera oxígeno dentro de la base. El reactor restaura batería. Correr consume batería; detener una reparación interrumpe su progreso.
 
-> **DIRECTIVA 01:** ninguna reparación, herramienta ni récord personal vale más que volver con toda la tripulación.
+## ⌨️ Controles
 
-## 🛰️ Tu expediente de entrenamiento
+| Acción | Tecla |
+| --- | --- |
+| Moverse | **WASD** o **flechas** |
+| Reparar / recargar / despegar | Mantener **E** cerca del equipo |
+| Correr | Mantener **Shift** |
+| Pausa | **P** |
+| Activar o silenciar sonido | **M** |
+
+En pantallas pequeñas aparecen una cruceta y un botón de acción táctiles. La misión se pausa si la ventana pierde el foco.
 
 <div align="center">
 
-<img src="assets/despegue.gif" alt="Cohete despegando" width="48%" />
-<img src="assets/orbita.gif" alt="Satélite orbitando la Tierra" width="48%" />
-
-**DEL PRIMER DESPEGUE A TU PRIMER PASEO ESPACIAL**
+<img src="assets/telemetria.gif" width="48%" alt="Telemetría pixel art" />
+<img src="assets/senal.gif" width="48%" alt="Antena pixel art" />
 
 </div>
 
-| Fase | Misión | Lo que vas a poner a prueba |
-| :---: | --- | --- |
-| **01** 🚀 | **Listos para despegar** | Clima, protocolos GO / NO-GO y decisiones durante el ascenso. |
-| **02** 🌍 | **Órbita estable** | Microgravedad, maniobras orbitales y pérdida de señal. |
-| **03** 🌱 | **Vida a bordo** | Aire respirable, reciclaje de agua y respuesta ante humo. |
-| **04** 👨‍🚀 | **Paseo espacial** | Líneas de seguridad, presión del traje y herramientas en el vacío. |
+## 🚀 Ejecutar en local
 
-Las misiones se desbloquean en orden. Completa las tres decisiones de una fase para acceder a la siguiente, incluso si te equivocas: el entrenamiento también consiste en aprender del error.
-
-### Lo que llevas en el traje
-
-- **12 escenarios interactivos**, con contexto científico y explicación de cada decisión.
-- **Puntos y rachas:** un acierto vale 100 puntos; los consecutivos suman un bono de hasta 100 puntos extra por respuesta.
-- **Cuatro insignias**, una por cada misión completada.
-- **Rangos de cadete**, desde Aspirante espacial hasta Comandante junior.
-- **Progreso local**, guardado en el navegador para retomar el entrenamiento.
-- **Interfaz adaptable**, con ilustraciones hechas en CSS y SVG, controles de teclado y avisos para lectores de pantalla.
-
-<details>
-<summary><strong>🎖️ Consultar requisitos de ascenso</strong></summary>
-
-| Puntos acumulados | Rango |
-| ---: | --- |
-| 0–449 | Aspirante espacial |
-| 450–899 | Cadete orbital |
-| 900–1399 | Especialista de misión |
-| 1400 o más | Comandante junior |
-
-Una respuesta incorrecta corta la racha. Volver a una pregunta respondida permite repasar, pero no volver a sumar puntos. El botón **Reiniciar** borra el expediente guardado y permite empezar de cero.
-
-</details>
-
-## 🚀 Despegue local
-
-Necesitas **Git** y una versión reciente de **Node.js** compatible con módulos ES y `node --test`.
+Con Node.js reciente y Git instalados:
 
 ```bash
 git clone https://github.com/alejondr3/Lostiravida2.git
@@ -102,86 +68,39 @@ cd Lostiravida2
 npm start
 ```
 
-Abre **[http://127.0.0.1:4173/](http://127.0.0.1:4173/)**, registra tu nombre de cadete y acepta la primera misión.
+Abre **[http://127.0.0.1:4173/](http://127.0.0.1:4173/)**. No necesitas instalar dependencias.
 
-**No hace falta ejecutar `npm install`:** el juego y su servidor local no requieren paquetes externos.
-
-```text
-[✓] Servidor en línea
-[✓] Sistemas de entrenamiento listos
-[✓] Identificación del cadete pendiente
-[ ] Café del comandante localizado
-```
-
-## 🧭 Cómo jugar
-
-1. **Identifícate.** Elige el nombre que aparecerá en tu expediente.
-2. **Acepta una misión.** Lee el informe y revisa qué habilidad entrenarás.
-3. **Observa y decide.** Usa el dato de misión para elegir una de las tres respuestas.
-4. **Lee la explicación.** Entender el procedimiento importa tanto como acertar.
-5. **Avanza.** Consigue tu insignia, desbloquea la siguiente fase y sube de rango.
-
-El progreso pertenece al navegador donde juegas. Cambiar de dispositivo o borrar los datos del sitio no transfiere tu expediente. El nombre y las respuestas se guardan en `localStorage`; el juego no tiene cuentas ni un backend de usuarios.
-
-## 🔧 Manual técnico
-
-<div align="center">
-
-<img src="assets/telemetria.gif" alt="Telemetría de sistemas en funcionamiento" width="48%" />
-<img src="assets/senal.gif" alt="Enlace de comunicaciones activo" width="48%" />
-
-</div>
-
-La academia funciona con **HTML, CSS y JavaScript nativo**. El servidor de desarrollo usa únicamente módulos incluidos en Node.js.
+## 🛠️ Dentro del motor
 
 ```text
-Lostiravida2/
-├── index.html          # Entrada de la academia
-├── styles.css          # Identidad visual, escenas y diseño adaptable
-├── server.mjs          # Servidor HTTP para desarrollo local
-├── package.json        # Comandos del proyecto
-├── src/
-│   ├── app.js          # Pantallas, interacción y flujo de entrenamiento
-│   ├── game.js         # Puntos, rangos, desbloqueos y persistencia
-│   └── missions.js     # Misiones, preguntas y explicaciones
-└── test/
-    └── game.test.js    # Verificación de las reglas del entrenamiento
+src/
+├── expedition-engine.js   # Colisiones, oxígeno, recursos y reparaciones
+└── expedition.js          # Escenario, sprites, cámara, audio y controles
+expedition.css            # Interfaz y controles táctiles
+assets/                   # Banner y GIF de pixel art
+scripts/                  # Generador de animaciones del README
+test/expedition.test.js   # Reglas de supervivencia y extracción
+server.mjs                # Servidor local sin dependencias
 ```
 
-### Diagnóstico de sistemas
+Canvas a **640 × 360**, escalado con píxeles nítidos, cámara con seguimiento y escenario de **960 × 640**. Sprites y habitaciones dibujados con código, efectos de polvo, minimapa y audio sintetizado. Las tipografías tienen respaldo local de sistema.
 
 ```bash
 npm test
 ```
 
-Las pruebas comprueban nombres de cadete, puntuación, rachas, bloqueo de puntos duplicados, desbloqueo de misiones y rangos.
+Las pruebas cubren colisiones, interrupción de reparaciones, requisitos de piezas, agotamiento y recarga de oxígeno, y extracción completa. La partida actual vive en memoria; recargar la página inicia una nueva expedición.
 
-### Publicar la academia
+## 📦 Despliegue
 
-Los archivos del juego pueden servirse directamente como sitio estático: **no hay paso de compilación**. La raíz del repositorio contiene `index.html`, `styles.css` y `src/`.
-
-En GitHub Pages, utiliza la rama `main` y la carpeta raíz. En un alojamiento estático, publica esa misma raíz. `server.mjs` sirve para desarrollo local y no es necesario para ejecutar el juego en un hosting estático.
-
-Las tipografías se cargan desde Google Fonts y tienen fuentes de respaldo; las ilustraciones se dibujan con CSS y SVG.
-
-## 🛠️ Ampliar el programa
-
-¿Tienes una idea para el siguiente entrenamiento? El banco de escenarios está en [`src/missions.js`](src/missions.js), y las reglas de progresión están en [`src/game.js`](src/game.js).
-
-Puedes proponer mejoras o reportar fallos en [Issues](https://github.com/alejondr3/Lostiravida2/issues). Para aportar código, crea una rama, verifica las pruebas y abre un pull request explicando qué cambia para el cadete.
-
-> Este proyecto ofrece escenarios educativos simplificados. No sustituye procedimientos operativos ni entrenamiento espacial profesional.
+El juego es estático y no necesita compilación. Publica la raíz que contiene `index.html` en GitHub Pages o en cualquier alojamiento estático. `server.mjs` es únicamente el servidor para desarrollo local.
 
 ---
 
 <div align="center">
 
-**CONSTRUIDO POR [@alejondr3](https://github.com/alejondr3)**
+**[@alejondr3](https://github.com/alejondr3) · ARCHIVO DE EXPEDICIÓN 02**
 
-`APRENDE · DECIDE · EXPLORA`
-
-*Fin de la transmisión. Nos vemos en órbita.* 🪐
-
-<img src="assets/orbita.gif" alt="En órbita, esperando la siguiente misión" width="320" />
+*La base puede quedarse sin luz. Tú todavía puedes volver.*
 
 </div>

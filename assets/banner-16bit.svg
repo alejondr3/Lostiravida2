@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 600 180" shape-rendering="crispEdges">
+<rect width="600" height="180" fill="#080d1b"/>
+<path d="M0 142h30v-8h35v9h42v-16h45v12h50v-6h35v10h50v-8h38v8h44v-19h44v13h44v-7h48v13h65v-8h40v45H0z" fill="#432d3b"/>
+<path d="M0 161h38v-7h50v11h60v-8h50v9h76v-8h60v11h78v-9h68v9h70v-8h50v19H0z" fill="#75454a"/>
+<g fill="#526788"><path d="M24 18h2v2h-2zm48 14h2v2h-2zm83-17h2v2h-2zm130 10h2v2h-2zm112-6h2v2h-2zm138 7h2v2h-2zm42 53h2v2h-2zm-50 35h2v2h-2zm-99-73h2v2h-2zm-370 69h2v2h-2z"/></g>
+<g fill="#e6e0c9"><path d="M44 45h2v8h-2zm-3 3h8v2h-8zm328-17h2v8h-2zm-3 3h8v2h-8z"/></g>
+<path d="M478 17h36v5h12v6h6v12h5v28h-5v12h-6v6h-12v5h-36v-5h-12v-6h-6V68h-5V40h5V28h6v-6h12z" fill="#233e58"/>
+<path d="M478 17h36v5h-20v7h-15v12h-9v27h9v12h15v11h-16v-5h-12v-6h-6V68h-5V40h5V28h6v-6h12z" fill="#47738a"/>
+<text x="30" y="37" fill="#7bedb3" font-family="monospace" font-size="8" font-weight="bold" letter-spacing="2">LOS TIRA VIDA / 02</text>
+<text x="28" y="77" fill="#e6e0c9" font-family="monospace" font-size="25" font-weight="bold">OPERACIÓN:</text>
+<text x="28" y="109" fill="#ee9a51" font-family="monospace" font-size="29" font-weight="bold">ÚLTIMA LUZ</text>
+<text x="30" y="130" fill="#879cb3" font-family="monospace" font-size="8">EXPLORA · REPARA · SOBREVIVE</text>
+<g transform="translate(425 113)"><path d="M0 0h64v6h6v35h-6v6H0v-6h-6V6h6z" fill="#17263a"/><path d="M2 2h60v5H2zm0 35h60v5H2" fill="#8594a2"/><path d="M6 12h13v17H6zm19 0h13v17H25zm19 0h13v17H44z" fill="#e7aa61"/><path d="M8 14h9v13H8zm19 0h9v13h-9zm19 0h9v13h-9z" fill="#436776"/></g>
+<g transform="translate(535 111)"><path d="M3 0h18v3h3v18h-3v3H3v-3H0V3h3z" fill="#e6e0c9"/><path d="M4 5h16v11H4z" fill="#162a41"/><path d="M5 5h14v4H5z" fill="#76cfd7"/><path d="M4 25h16v17H4z" fill="#d4d3c5"/><path d="M0 26h4v13H0zm20 0h4v13h-4z" fill="#ee9a51"/><path d="M4 42h6v7H4zm10 0h6v7h-6z" fill="#3d5169"/></g>
+<path d="M20 167h130v2H20z" fill="#ee9a51"/><text x="30" y="159" fill="#e6e0c9" font-family="monospace" font-size="6">JUNIOR ASTRONAUT MISSION TRAINER</text>
+<rect x="2" y="2" width="596" height="176" fill="none" stroke="#34435a" stroke-width="2"/>
+</svg>
